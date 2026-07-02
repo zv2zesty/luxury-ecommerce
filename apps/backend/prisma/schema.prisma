@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  name        String
+  slug        String           @unique
+  description String
+  basePrice   Decimal          @db.Decimal(10, 2)
+  category    String           // e.g., "Men", "Women", "Home"
+  images      String[]         // Array of image URLs for your gallery layouts
+  variants    ProductVariant[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ProductVariant {
+  id        String    @id @default(uuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String    @unique // Stock Keeping Unit (e.g., RL-POLO-NAVY-MED)
+  color     String    // e.g., "Classic Navy"
+  size      String    // e.g., "M"
+  fit       String    // e.g., "Custom Slim Fit"
+  inventory Int       @default(0) // Live item stock count
+  price     Decimal?  @db.Decimal(10, 2) // Optional override price for premium variants
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  stripeSessionId String      @unique
+  customerEmail   String
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  status          String      @default("PENDING") // PENDING, PAID, SHIPPED
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sku       String
+  quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
+}
