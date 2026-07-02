@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-luxury-cream text-luxury-charcoal tracking-wide;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif tracking-widest uppercase;
+  }
+}
+
+/* Smooth, premium transitions for image hover zoom effects */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
